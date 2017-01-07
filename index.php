@@ -1,15 +1,20 @@
 <?php
 
+//时区设置
+date_default_timezone_set("Asia/Shanghai");
+
 require_once 'flight/Flight.php';
-require_once 'controller/ObjContainer.php';
+require_once 'controllers/ObjContainer.php';
 require_once 'tools/ObjContainer.php';
 require_once 'tools/cls_utils_tools.php';
-require_once('log4php/Logger.php');
+require_once 'log4php/Logger.php';
+//require_once 'models/ObjContainer.php';
 
-// require_once 'controller/ObjContainer.php';
-require_once 'model/ObjContainer.php';
+//日志配置
+Logger::configure('config/logger_config.xml');
 
-Logger::getLogger('Route')->debug($_SERVER);
+$route_logger = Logger::getLogger('Route');
+$route_logger->debug($_SERVER);
 
 // cross domain access
 if (isset($_SERVER['HTTP_ORIGIN'])) {
@@ -21,9 +26,6 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
     }
 }
-
-Logger::configure('config/logger_config.xml');
-date_default_timezone_set("Asia/Shanghai");
 
 //view
 Flight::set('flight.views.path', 'views');
@@ -97,31 +99,13 @@ Flight::map('sendRouteResult', function($data){
         Logger::getLogger("Route")->error(Flight::request());
         Logger::getLogger("Route")->error($result);
 
-        if($data['error_code'] == 50000) {
-//             $ts = @file_get_contents("config/alert.ts");
-//             if(empty($ts) || time() - intval($ts) > 600) {
-//                 $config = parse_ini_file('config/alert.ini');
-//                 $recipients = explode(',', $config['recipients']);
-//                 foreach($recipients as $r) {
-//                     $domain = Tools\ClsUtilsTools::$domain_array['allow']['api_domain'];
-//                     Tools\ClsMessageTools::sendSMS(
-//                         $r, 'juhe', 'message_alert_tpl',
-//                         array('error_code'=>$data['error_code'],
-//                               'url'=>"http://$domain:8080/?name=basic&lines=100&date="));
-//                 }
-//                 $handle = @fopen('config/alert.ts', 'w');
-//                 if(!empty($handle)) {
-//                     fprintf($handle, '%d', time());
-//                     fclose($handle);
-//                 }
-//             }
+        if($data['error_code'] != 50000) {
+            $data['result'] = 'ok';
+            Tools\ClsUtilsTools::array2string($data);
+            $result = $data;
+            Logger::getLogger("Route")->debug(Flight::request());
+            Logger::getLogger("Route")->debug($result);
         }
-    }else{
-        $data['result'] = 'ok';
-        Tools\ClsUtilsTools::array2string($data);
-        $result = $data;
-        Logger::getLogger("Route")->debug(Flight::request());
-        Logger::getLogger("Route")->debug($result);
     }
 
     Flight::json($result);

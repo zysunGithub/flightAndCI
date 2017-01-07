@@ -1,5 +1,6 @@
 <?php
 namespace Tools;
+
 use Logger;
 use Model;
 use Flight;

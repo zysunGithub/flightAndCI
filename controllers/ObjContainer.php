@@ -1,5 +1,4 @@
 <?php
-use Exception;
 $dir = __DIR__;
 //把控制器中的定义的路由信息加载到index.php文件中
 foreach(glob($dir.'/*.php') as $file)
@@ -13,4 +12,3 @@ foreach(glob($dir.'/*.php') as $file)
     }
 }
 
-?>

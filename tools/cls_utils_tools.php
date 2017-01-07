@@ -295,4 +295,3 @@ class ArrayConvert
 ClsUtilsTools::$error_array=parse_ini_file("config/errorcode.ini", true);
 //ClsUtilsTools::$domain_array=parse_ini_file("config/domain.ini", true);
 ClsUtilsTools::$constant_array=parse_ini_file("config/constants.ini", true);
-?>
