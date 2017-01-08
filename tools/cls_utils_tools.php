@@ -219,7 +219,7 @@ class ClsUtilsTools
         return ClsUtilsTools::$constant_array[$part][$keyname];
     }
 
-    static public function checkStringMatchRegex($string, $regex,$errorWhenNotMatch=42000){
+    static public function checkStringMatchRegex($string, $regex,$errorWhenNotMatch=40009){
         //int preg_match ( string $pattern , string $subject [, array &$matches [, int $flags = 0 [, int $offset = 0 ]]] )
         $temp =preg_match($regex, $string);
         if(empty($temp)){
@@ -233,7 +233,7 @@ class ClsUtilsTools
         }
     }
     
-    static public function checkStringNotNull($string,$errorWhenNotMatch=42000){
+    static public function checkStringNotNull($string,$errorWhenNotMatch=40009){
     	if(!isset($string)){
     		if($errorWhenNotMatch != false){
     			Flight::sendRouteResult(array('error_code'=>$errorWhenNotMatch));

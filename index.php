@@ -113,16 +113,16 @@ Flight::map('sendRouteResult', function($data){
 
 Logger::getLogger('Route')->debug(Flight::request());
 
-
+//assert option
 //temop to org
-assert_options(ASSERT_CALLBACK, 'my_assert_handler');
-function my_assert_handler($file, $line, $code)
-{
-    Logger::getLogger('Route')->error(array($file, $line, $code));
-    Flight::sendRouteResult(array(
-        "error_code"=>'50000',
-    ));
-}
+//assert_options(ASSERT_CALLBACK, 'my_assert_handler');
+//function my_assert_handler($file, $line, $code)
+//{
+//    Logger::getLogger('Route')->error(array($file, $line, $code));
+//    Flight::sendRouteResult(array(
+//        "error_code"=>'50000',
+//    ));
+//}
 
 try{
     $access_token=Flight::request()->cookies->AccessToken;
