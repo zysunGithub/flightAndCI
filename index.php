@@ -125,19 +125,15 @@ Logger::getLogger('Route')->debug(Flight::request());
 //}
 
 try{
-    $access_token=Flight::request()->cookies->AccessToken;
-    $access_type=empty(Flight::request()->cookies->AccessType)?"weishop":Flight::request()->cookies->AccessType;
-    $request_app_id=Flight::request()->query->app_id;
+    $token=Flight::request()->cookies->token;
 
-    $CAT_Result=Flight::checkAccessToken();
-    if($CAT_Result==0){
-        setcookie('AccessToken', '', 0, '/');
+    $access_result=Flight::checkAccessToken();
+    if(!$access_result){//没有权限访问
+        setcookie('token', '', 0, '/');
         Flight::sendRouteResult(array(
-            "error_code"=>'40001',
-            "error_stack"=>'AccessToken Check Failed. Input AccessToken: '.$access_token." and type is ".$access_type." for AppId ".$request_app_id,
+            "error_code" => '40001',
+            "error_stack" => "token check Failed. input token: .$token",
         ));
-        //Flight::halt(400, 'AccessToken Check Failed. Input AccessToken: '.$access_token." and type is ".$access_type);
-        //echo 'AccessToken Check Failed. Input AccessToken: '.$access_token." and type is ".$access_type;
     }
 
     Flight::start();

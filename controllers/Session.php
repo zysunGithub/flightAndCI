@@ -16,6 +16,11 @@ class Session
        Flight::map('checkAccessToken',function(){
            return Session::checkAccessToken();
        });
+
+       Flight::route('POST /admin/login',function(){
+           $result = Session::adminLogin();
+           Flight::sendRouteResult($result);
+       });
     }
 
     /**
@@ -84,5 +89,45 @@ class Session
         );
 
         return $return_value;
+    }
+
+    /**
+     * #登录成功返回token
+     * #登录失败返回错误信息
+     * @return array
+     */
+    public function adminLogin()
+    {
+        $post_data = Flight::request()->data->getData();
+        $admin_user = isset($post_data['admin_user']) ? $post_data['admin_user'] : '';
+        $pass_word = isset($post_data['pass_word']) ? $post_data['pass_word'] : '';
+
+        //根据用户名和密码查询用户是否存在
+        $user_data = SessionModel::getUserInfoByNamePassWord($admin_user,$pass_word);
+        if(empty($user_data)){
+            return array('error_code' => '40001','error_info' => '用户名或密码错误');
+        }
+
+        if(count($user_data) == 1){
+            //登录成功，则生成token写入数据库
+            $token = $this->createToken($admin_user);
+            $save_result = SessionModel::saveToken($user_data['user_id'],$token);
+            if(empty($save_result)){
+                return array('error_code' => 40010, 'error_info' => 'token写入失败');
+            }
+
+            return array('token' => $token);
+        }
+
+        return array('error_code' => '40010', 'error_info' => '数据库中存有多个相同的用户');
+    }
+
+    /**
+     * @param string $admin_user 登录用户名
+     * @return mixed 生成token信息
+     */
+    public function createToken($admin_user)
+    {
+        return uniqid(md5($admin_user).'-'.md5(rand()).'-',true);
     }
 }
