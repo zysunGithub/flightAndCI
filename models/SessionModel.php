@@ -14,7 +14,7 @@ class SessionModel
     {
         $sql = "select 
                   count(*) 
-                from admin 
+                from test_admin 
                 where 
                   token = '{$token}'";
 
@@ -26,12 +26,12 @@ class SessionModel
      * @param $pass_word 登录用户密码
      * @return mixed    返回符合条件的用户记录
      */
-    public function getUserInfoByNamePassWord($user_name,$pass_word)
+    static public function getUserInfoByNamePassWord($user_name, $pass_word)
     {
-        $sql = "select user_id,
-                       user_name 
-                from admin 
-                where user_name = '{$user_name}' and 
+        $sql = "select admin_user_id,
+                       admin_user_name 
+                from test_admin 
+                where admin_user_name = '{$user_name}' and 
                       pass_word = '{$pass_word}'
                 ";
 
@@ -43,7 +43,7 @@ class SessionModel
      * @param $token   用户登录验证成功时生成的token
      * @return mixed   返回sql执行的结果
      */
-    public function saveToken($user_id, $token)
+    static public function saveToken($user_id, $token)
     {
         $ip = Flight::request()->ip;
 
@@ -52,8 +52,8 @@ class SessionModel
                             token,
                             expire_time,
                             created_time,
-                            update_time,
-                            login_ip
+                            last_updated_time,
+                            ip
                             ) 
                  values(
                        {$user_id},

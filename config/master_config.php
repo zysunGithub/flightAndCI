@@ -9,7 +9,6 @@ $master_config = array(
 		'/admin/login',
 	],
 	"free_token_url_prefix_arr" => [//url前缀在数组里,也可免token登录
-		'',
 	],
 	
 );    

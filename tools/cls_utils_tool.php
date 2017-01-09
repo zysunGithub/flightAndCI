@@ -281,14 +281,14 @@ class ClsUtilsTools
     {
         $data = is_object($data)? get_object_vars($data) :$data;
 
-        if(isset($data['error_code'])){
-            if(!isset($data['error_stack'])){
+        if(isset($data['error_code'])) {
+            if (!isset($data['error_stack'])) {
                 $data['error_stack'] = $data;
             }
-            if(!isset($data['error_code'])){
+            if (!isset($data['error_code'])) {
                 $data['error_code'] = '50000';
             }
-            if(!isset($data['error_info'])){
+            if (!isset($data['error_info'])) {
                 $data['error_info'] = self::getErrorInfo($data['error_code']);
             }
 
@@ -300,14 +300,12 @@ class ClsUtilsTools
 
             Logger::getLogger("Route")->error(Flight::request());
             Logger::getLogger("Route")->error($result);
-
-            if($data['error_code'] != 50000) {
-                $data['result'] = 'ok';
-                self::array2string($data);
-                $result = $data;
-                Logger::getLogger("Route")->debug(Flight::request());
-                Logger::getLogger("Route")->debug($result);
-            }
+        } else {
+            $data['result'] = 'ok';
+            self::array2string($data);
+            $result = $data;
+            Logger::getLogger("Route")->debug(Flight::request());
+            Logger::getLogger("Route")->debug($result);
         }
 
         Flight::json($result);

@@ -73,8 +73,8 @@ Logger::getLogger('Route')->debug(Flight::request());
 
 try{
     $token=Flight::request()->cookies->token;
-
     $access_result=Flight::checkAccessToken();
+
     if(!$access_result){//没有权限访问
         setcookie('token', '', 0, '/');
         Flight::sendRouteResult(array(
