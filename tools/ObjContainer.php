@@ -10,9 +10,11 @@ require_once 'cls_basic_data.php';
 require_once 'HttpClient.php';
 require_once 'config/master_config.php';
 require_once 'cls_test_tool.php';
+require_once 'cls_utils_tool.php';
 
 Flight::set('master_config', $master_config);
 
+Flight::map('sendRouteResult',array("Tools\\ClsUtilsTools","sendRouteResult"));
 Flight::map('checkParamMatchRegex',array("Tools\\ClsUtilsTools","checkStringMatchRegex"));
 Flight::map('generateBarCode',array("Tools\\ClsUtilsTools","generateBarCode"));
 Flight::map('checkParamNotNull', array("Tools\\ClsUtilsTools", "checkStringNotNull"));

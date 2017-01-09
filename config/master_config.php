@@ -6,7 +6,7 @@ $master_config = array(
 		"test_url" => "待调用的接口",
 	],
 	"free_token_url_arr" => [//不用token验证就可访问的url
-		'',
+		'/admin/login',
 	],
 	"free_token_url_prefix_arr" => [//url前缀在数组里,也可免token登录
 		'',

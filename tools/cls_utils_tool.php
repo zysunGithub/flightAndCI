@@ -2,6 +2,7 @@
 namespace Tools;
 
 use Flight;
+use Logger;
 
 class ClsUtilsTools
 {
@@ -51,7 +52,7 @@ class ClsUtilsTools
 	static public function array2string (&$data) {
 		if(is_array($data)){
 			foreach ($data as $key => &$value) {
-				ClsUtilsTools::array2string($value);
+				self::array2string($value);
 			}
 		}else{
 			$data = $data===null ? "" : $data;
@@ -73,14 +74,14 @@ class ClsUtilsTools
     }
 
 	static public function isAllowCrossDomain($domain) {
-		$temp = ClsUtilsTools::$domain_array['allow'];
+		$temp = self::$domain_array['allow'];
 		$domains = explode(",", $temp['domain_name']);
 		return in_array($domain, $domains);
 	}
 
 	static public function getErrorInfo ($error_code, $arg1=null, $arg2=null, $arg3=null, $arg4=null, $arg5=null) {
 		$language = 'cn';
-		$errors = ClsUtilsTools::$error_array[$language];
+		$errors = self::$error_array[$language];
 		if (isset($errors[$error_code])) {
 			$string = $errors[$error_code]; 
 		} else {
@@ -216,7 +217,7 @@ class ClsUtilsTools
 // 		var_dump($part);
 // 		var_dump($keyname);
 		//die('ssss');
-        return ClsUtilsTools::$constant_array[$part][$keyname];
+        return self::$constant_array[$part][$keyname];
     }
 
     static public function checkStringMatchRegex($string, $regex,$errorWhenNotMatch=40009){
@@ -259,6 +260,57 @@ class ClsUtilsTools
     static public function arrayToObject (&$array)
     {
         ArrayConvert::main($array);
+    }
+
+    /**
+     * Usage as following: (Sinri 2015-05-08 Afternoon)
+     *
+     * # Normal response
+     * Flight::sendRouteResult(array(
+     *     // 'error_code'=>'200',// [Optional] This is by default as NoError.
+     *     'data'=>'XXX', // Any response(s) needed.
+     * ));
+     *
+     * # Error response
+     * Flight::sendRouteResult(array(
+     *     'error_code'=>'500', // Or Other error code, other than 200.
+     *     // 'error_info'=>'Customized Info', // [Optional] It could be set by default with config.
+     * ));
+     **/
+    public static function sendRouteResult($data)
+    {
+        $data = is_object($data)? get_object_vars($data) :$data;
+
+        if(isset($data['error_code'])){
+            if(!isset($data['error_stack'])){
+                $data['error_stack'] = $data;
+            }
+            if(!isset($data['error_code'])){
+                $data['error_code'] = '50000';
+            }
+            if(!isset($data['error_info'])){
+                $data['error_info'] = self::getErrorInfo($data['error_code']);
+            }
+
+            $result = array(
+                'result' => 'fail',
+                'error_code' => $data['error_code'], // For Error Type. See predefined config
+                'error_info' => $data['error_info']  // For Error Shotting. Could be auto set with config by default
+            );
+
+            Logger::getLogger("Route")->error(Flight::request());
+            Logger::getLogger("Route")->error($result);
+
+            if($data['error_code'] != 50000) {
+                $data['result'] = 'ok';
+                self::array2string($data);
+                $result = $data;
+                Logger::getLogger("Route")->debug(Flight::request());
+                Logger::getLogger("Route")->debug($result);
+            }
+        }
+
+        Flight::json($result);
     }
 
 }
