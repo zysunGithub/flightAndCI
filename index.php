@@ -71,7 +71,7 @@ Logger::getLogger('Route')->debug(Flight::request());
 //    ));
 //}
 
-try{
+try {
     $token=Flight::request()->cookies->token;
     $access_result=Flight::checkAccessToken();
 
@@ -84,7 +84,7 @@ try{
     }
 
     Flight::start();
-} catch(Exception $e){
+} catch(Exception $e) {
     Logger::getLogger('Route')->error($e);
     Flight::sendRouteResult(array(
         "error_code"=>'50000',

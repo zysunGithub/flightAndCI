@@ -14,9 +14,11 @@ class SessionModel
     {
         $sql = "select 
                   count(*) 
-                from test_admin 
+                from admin_session 
                 where 
-                  token = '{$token}'";
+                  token = '{$token}' and 
+                  expire_time > now()
+                  ";
 
         return Flight::db()->getRow($sql);
     }

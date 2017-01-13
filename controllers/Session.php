@@ -33,15 +33,13 @@ class Session
         //登录时生成的信息，用于验证用户身份
         $access_token = !empty($cookie_data['token']) ? $cookie_data['token'] : '';
 
-        if(empty($access_token)){
-            //$access_token为空时，判断请求的api是否为免验证的Url
-            if(self::isFreeTokenUrl()) {
-                $return_value = true;
-            }
+        if(self::isFreeTokenUrl()){
+            //判断请求的api是否为免验证的Url
+            $return_value = true;
         }else{
             //通过token验证数据信息
             $data_from_db = SessionModel::checkUserByToken($access_token);
-            if(1 == $data_from_db){
+            if($data_from_db > 0){
                 $return_value = true;
             }
         }
@@ -97,8 +95,8 @@ class Session
     static public function cbAdminLogin()
     {
         $post_data = Flight::request()->data->getData();
-        $admin_user = isset($post_data['admin_user_name']) ? $post_data['admin_user_name'] : '';
-        $pass_word = isset($post_data['pass_word']) ? md5($post_data['pass_word']) : '';
+        $admin_user = isset($post_data['user_name']) ? $post_data['user_name'] : '';
+        $pass_word = isset($post_data['pass_word']) ? $post_data['pass_word'] : '';
 
         try{
             Flight::db()->start_transaction();
