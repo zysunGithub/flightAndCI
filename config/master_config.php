@@ -7,6 +7,8 @@ $master_config = array(
 	],
 	"free_token_url_arr" => [//不用token验证就可访问的url
 		'/admin/login',
+		'/admin/checkEmail',
+		'/admin/resetPassword',
 	],
 	"free_token_url_prefix_arr" => [//url前缀在数组里,也可免token登录
 	],

@@ -23,19 +23,33 @@ class SessionModel
         return Flight::db()->getRow($sql);
     }
 
+    static public function resetPassword($token, $pass_word)
+    {
+        $sql = "update test_admin ta
+                inner join admin_session ass on ta.admin_user_id = ass.user_id
+                set ta.pass_word = '{$pass_word}'
+                where 
+                    ass.token = '{$token}'
+                ";
+
+        return Flight::db()->exec($sql);
+    }
+
     /**
-     * @param $user_name 登录用户名称
-     * @param $pass_word 登录用户密码
-     * @return mixed    返回符合条件的用户记录
+     * @param array $data 获取数据记录的条件
+     * @return array 返回符合条件的记录
      */
-    static public function getUserInfoByNamePassWord($user_name, $pass_word)
+    static public function getUserInfo($data)
     {
         $sql = "select admin_user_id,
                        admin_user_name 
                 from test_admin 
-                where admin_user_name = '{$user_name}' and 
-                      pass_word = '{$pass_word}'
+                where 1 
                 ";
+
+        if(isset($data['user_name'])) $sql .= " and admin_user_name = '{$data['user_name']}' ";
+        if(isset($data['pass_word'])) $sql .= " and pass_word = '{$data['pass_word']}' ";
+        if(isset($data['email'])) $sql .= " and email = '{$data['email']}' ";
 
         return Flight::db()->getAll($sql);
     }
@@ -67,5 +81,19 @@ class SessionModel
                  )";
 
         return Flight::db()->exec($sql);
+    }
+
+    static public function getToken($user_id)
+    {
+
+        $sql = "select token 
+                from admin_session
+                where 
+                    user_id = {$user_id}
+                order by expire_time DESC 
+                limit 1
+                 ";
+
+        return Flight::db()->getOne($sql);
     }
 }

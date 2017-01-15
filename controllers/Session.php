@@ -19,7 +19,9 @@ class Session
             return Session::checkAccessToken();
         });
 
-        Flight::route('POST /admin/login',array(get_called_class(),'cbAdminLogin'));
+        Flight::route('POST /admin/login', array(get_called_class(), 'cbAdminLogin'));
+        Flight::route('POST /admin/checkEmail', array(get_called_class(), 'cbCheckEmail'));
+        Flight::route('POST /admin/resetPassword', array(get_called_class(), 'cbResetPassword'));
     }
 
     /**
@@ -102,7 +104,7 @@ class Session
             Flight::db()->start_transaction();
 
             //根据用户名和密码查询用户是否存在
-            $user_data = SessionModel::getUserInfoByNamePassWord($admin_user,$pass_word);
+            $user_data = SessionModel::getUserInfo(['user_name' => $admin_user, 'pass_word' => $pass_word]);
             if(empty($user_data)){
                 throw new Exception('用户名或密码错误');
             }
@@ -132,6 +134,64 @@ class Session
     }
 
     /**
+     * 验证用户名和邮箱是否匹配
+     */
+    static public function cbCheckEmail()
+    {
+        $return_value = array('error_info' => '用户名和邮箱不匹配', 'error_code' => '');
+
+        $post_data = Flight::request()->data->getData();
+
+        $user_name = isset($post_data['user_name']) ? $post_data['user_name'] : '';
+        $email = isset($post_data['email']) ? $post_data['email'] : '';
+
+        $user_info = SessionModel::getUserInfo(['user_name' => $user_name, 'email' => $email]);
+
+        if(count($user_info) == 1){
+
+            $time = time();
+            $token = SessionModel::getToken($user_info[0]['admin_user_id']);
+            $return_value = array('token' => $token, 'timestamp' => $time);
+
+        }
+
+        Flight::sendRouteResult($return_value);
+    }
+
+
+    /**
+     * 根据token重置密码
+     */
+   static public function cbResetPassword()
+    {
+        $return_value = array();
+
+        try{
+
+            $post_data = Flight::request()->data->getData();
+
+            $token = isset($post_data['token']) ? $post_data['token'] : '';
+            $pass_word = isset($post_data['pass_word']) ? $post_data['pass_word'] : '';
+
+            $result = SessionModel::resetPassword($token, $pass_word);
+
+            if($result == 0){
+
+                $return_value = array('error_info' => '新旧密码相同', 'error_code' => '');
+
+            }
+
+        }catch (Exception $e){
+
+            Logger::getLogger('session')->info('reset password failed: '.$e->getMessage());
+            Flight::sendRouteResult(array('error_info' => $e->getMessage(), 'error_code' => ''));
+
+        }
+
+        Flight::sendRouteResult($return_value);
+    }
+
+    /**
      * @param string $admin_user 登录用户名
      * @return mixed 生成token信息
      */
@@ -139,4 +199,5 @@ class Session
     {
         return uniqid(md5($admin_user).'-'.md5(rand()).'-',true);
     }
+
 }
